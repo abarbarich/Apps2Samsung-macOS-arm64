@@ -726,6 +726,16 @@ namespace Apps2Samsung.ViewModels
                 Releases.Clear();
                 foreach (var r in list)
                     Releases.Add(r);
+
+                // Pre-select the default Jellyfin build so the dropdown isn't empty on load.
+                // The list is sorted alphabetically, so explicitly prefer a "Jellyfin …" entry
+                // (the main jellyfin-tizen build sorts ahead of the AVPlay/Legacy variants),
+                // falling back to the first entry. Selecting a release also triggers
+                // OnSelectedReleaseChanged, which auto-picks its default Jellyfin.wgt asset.
+                SelectedRelease ??=
+                    Releases.FirstOrDefault(r => r.Name.StartsWith(
+                        Constants.AppIdentifiers.JellyfinAppName, StringComparison.OrdinalIgnoreCase))
+                    ?? Releases.FirstOrDefault();
             }
             catch (OperationCanceledException)
             {
