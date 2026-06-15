@@ -26,6 +26,17 @@
   🇩🇰 🇳🇱 🇬🇧 🇫🇷 🇩🇪 🇵🇹 🇹🇷 
 </p>
 
+> ### 🍴 About this fork
+>
+> This is a community fork of **[Samsung-Jellyfin-Installer / Apps2Samsung](https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer)** by **Patrick Stel ([@PatrickSt1991](https://github.com/PatrickSt1991))**. All credit for the tool itself goes to Patrick and the upstream contributors — please ⭐ and support the original project.
+>
+> This fork only adds **native Apple Silicon (ARM64 macOS) support**:
+> - A bundled native `darwin-arm64` esbuild with architecture-aware selection — fixes JavaScript transpilation on M-series Macs (upstream shipped only an x86-64 binary and looked for a non-existent `osx-universal` path)
+> - Pre-selects the default Jellyfin build in the app dropdown instead of leaving it empty
+> - A `make-macos-app.sh` helper that wraps a build into a double-clickable, signed `.app`
+>
+> **Most users should use the [official upstream releases](https://github.com/Jellyfin2Samsung/Samsung-Jellyfin-Installer/releases).** To build this fork natively on Apple Silicon, see [Building from source on macOS](#-building-from-source-on-macos-apple-silicon).
+
 ---
 
 ## 📦 Current Versions
@@ -60,6 +71,32 @@ That’s it. No manual certificate handling required in most cases.
 https://www.youtube.com/watch?v=_8mSV5pW-ic
 
 **NixOS:** Clone the repository and run `nix-shell` — the shell environment will automatically build and launch the tool.
+
+---
+
+## 🍎 Building from source on macOS (Apple Silicon)
+
+This fork builds and runs **natively on Apple Silicon** (M1–M4) — no Rosetta required.
+
+**Prerequisite — the .NET 8 SDK:**
+
+```bash
+brew install dotnet@8
+export DOTNET_ROOT="$(brew --prefix dotnet@8)/libexec"
+export PATH="$(brew --prefix dotnet@8)/bin:$PATH"
+```
+
+**Build a native, double-clickable app bundle:**
+
+```bash
+cd Jellyfin2Samsung-CrossOS
+dotnet publish Apps2Samsung.csproj -c Release -r osx-arm64 \
+  -p:SelfContained=true -p:UseAppHost=true -o publish/osx-arm64
+./make-macos-app.sh osx-arm64        # assembles & ad-hoc signs publish/Apps2Samsung.app
+open publish/Apps2Samsung.app
+```
+
+Drag `Apps2Samsung.app` into `/Applications` to install it. On Intel Macs, substitute `osx-x64` in both commands.
 
 ---
 
